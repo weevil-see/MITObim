@@ -27,7 +27,7 @@ def write_clipped(seq_header, seq_seq, start, end, prefix):
 	l = str(end - start)
 
 	#writing out clipped sequence
-	print "clip points: %i - %i - length: %s -> writing sequence to '%s.circular.%s.fasta'\n" %(start, end, l, prefix, l)
+	print("clip points: %i - %i - length: %s -> writing sequence to '%s.circular.%s.fasta'\n" %(start, end, l, prefix, l))
 	sequence = seq_seq[start:end]
 	out = open(prefix+'.circular.'+l+'.fasta','w')
 	out.write(">%s_ciruclar_%s\n%s\n" %(seq_header, str(l), sequence))
@@ -43,11 +43,11 @@ def write_clipped(seq_header, seq_seq, start, end, prefix):
 
 def roll_over(seq_seq, new_start, prefix):
 
-	print "new start coordinate: %s -> writing sequence to '%s.roll.%s.fasta'\n" %(new_start, prefix, new_start)
+	print("new start coordinate: %s -> writing sequence to '%s.roll.%s.fasta'\n" %(new_start, prefix, new_start))
 	sequence = seq_seq[new_start-1:]+seq_seq[:new_start-1]
 	out = open(prefix+'.rolled.'+str(new_start)+'.fasta', 'w')
 	out.write(">%s_s%s_l%s\n%s\n" %(prefix, new_start, len(sequence), sequence))
-        out.close()
+	out.close()
 
 parser = argparse.ArgumentParser(description=DESCRIPTION, prog='circules.py', 
 	formatter_class=argparse.RawDescriptionHelpFormatter, 
@@ -89,10 +89,10 @@ parser.add_argument("--version", action="version", version=VERSION)
 args = parser.parse_args()
 
 if len(sys.argv) < 2:	#if the script is called without any arguments display the usage
-    print
-    print "%s\n" %DESCRIPTION
+    print()
+    print("%s\n" %DESCRIPTION)
     parser.print_usage()
-    print
+    print()
     sys.exit(1)
 
 if '-' in args.kmer:
@@ -113,37 +113,37 @@ for l in fa:
 		seqs[current]+=l.strip().upper()
 
 if len(seqs) > 1:
-	print "\nThe file '%s' contains %i sequences. The circules script is currently designed to only handle a single fasta sequence at a time - Sorry!\n" %(args.fasta, len(seqs))
+	print("\nThe file '%s' contains %i sequences. The circules script is currently designed to only handle a single fasta sequence at a time - Sorry!\n" %(args.fasta, len(seqs)))
 	sys.exit()
 
-print "%s\n" %DESCRIPTION
+print("%s\n" %DESCRIPTION)
 
-print "\n###########################\n\nProcessing sequence of length %s" %len(seqs[seqs.keys()[0]])
+print("\n###########################\n\nProcessing sequence of length %s" %len(seqs[list(seqs.keys())[0]]))
 
 if args.newstart_roll:
-	print "\n####################\n## Result output ##\n####################\n"
-	print "\n'Rolling' circular sequence to new start coordinate .." 
-	roll_over(seqs[seqs.keys()[0]], args.newstart_roll, args.prefix)
-	print ""
+	print("\n####################\n## Result output ##\n####################\n")
+	print("\n'Rolling' circular sequence to new start coordinate ..") 
+	roll_over(seqs[list(seqs.keys())[0]], args.newstart_roll, args.prefix)
+	print("")
 	sys.exit()
 	
 
 if args.extract_by_coordinates:
 	if not ',' in args.extract_by_coordinates:
-		print "Expecting clipping coordinates delimited by comma (','), e.g. '-c 50,1567'"
+		print("Expecting clipping coordinates delimited by comma (','), e.g. '-c 50,1567'")
 		sys.exit()
-	print "\n####################\n## Result output ##\n####################\n"
-	print "\nExtracting sequence by coordinates .."
+	print("\n####################\n## Result output ##\n####################\n")
+	print("\nExtracting sequence by coordinates ..")
 	clips = args.extract_by_coordinates.split(",")
-	write_clipped(seqs.keys()[0], seqs[seqs.keys()[0]], clips[0], clips[1], args.prefix)
-	print ""
+	write_clipped(list(seqs.keys())[0], seqs[list(seqs.keys())[0]], clips[0], clips[1], args.prefix)
+	print("")
 	sys.exit()
 
 for k in range(kmers[0],kmers[1],kmers[2]):
 	clips = {}
 	repeats = {}
 	for s in seqs:
-		print "\nCollecting %s-mers .." %k,
+		print("\nCollecting %s-mers .." %k, end=' ')
 		i=0
 		while i <= (len(seqs[s])-k):
 			kmer = str(seqs[s][i:i+k])
@@ -158,7 +158,7 @@ for k in range(kmers[0],kmers[1],kmers[2]):
 					kmer = str(seqs[s][i:i+k])
 					skip = 0
 #					print "%i %s" %(i, kmer)
-					for pos in reversed(range(len(kmer))):
+					for pos in reversed(list(range(len(kmer)))):
 #						print pos,kmer[pos]
 						if not kmer[pos] in 'acgtACGT':
 #							print "%i\tambiguous" %pos
@@ -172,10 +172,10 @@ for k in range(kmers[0],kmers[1],kmers[2]):
 			dic[kmer].append(i)
 #			print "\tok"
 			i+=1
-		print "Done!"
+		print("Done!")
 
 
-	print "Evaluating %s-mers .." %k,
+	print("Evaluating %s-mers .." %k, end=' ')
 
 	for s in seqs:
 		test = {}
@@ -203,11 +203,11 @@ for k in range(kmers[0],kmers[1],kmers[2]):
 
 			i+=1
 
-		print "Done!\n"
+		print("Done!\n")
 
 	if repeats:
 
-		print "\n###################\n## Repeat report ##\n###################"
+		print("\n###################\n## Repeat report ##\n###################")
 		tandem = {}
 		for kmer in repeats:
 			repeats[kmer] = sorted(list(set(repeats[kmer])))
@@ -274,7 +274,7 @@ for k in range(kmers[0],kmers[1],kmers[2]):
 				block_start_end_coordinates = {}
 
 				minstep = int(sorted(tandem[m[0]][2])[0])
-				coordinates = range(m[0],m[1]+1)
+				coordinates = list(range(m[0],m[1]+1))
 				
 				if minstep >= k:
 					m[1]+=k-1
@@ -295,25 +295,25 @@ for k in range(kmers[0],kmers[1],kmers[2]):
 				motif = seqs[s][m[0]:m[1]+1]
 				if not motif in motifs_by_regions:
 					motifs_by_regions[motif] = []
-				print "\nmotif '%s', found multiple times in the following region(s) (start - end coordinate):" %seqs[s][m[0]:m[1]+1]
+				print("\nmotif '%s', found multiple times in the following region(s) (start - end coordinate):" %seqs[s][m[0]:m[1]+1])
 				
 
 				for b in sorted(block_start_end_coordinates):
 #					print b,block_start_end_coordinates[b]
 					start = block_start_end_coordinates[b][0]
 					end = block_start_end_coordinates[b][1]
-					print "%i - %i (%i x)" %(start, end, (end-start)/(m[1]-m[0]+1))
+					print("%i - %i (%i x)" %(start, end, (end-start)/(m[1]-m[0]+1)))
 #					print seqs[s][start:end+1]
 #					print len(seqs[s])
 					motifs_by_regions[motif].append([start,end])
 
 
-	print "\n########################\n## Circularity report ##\n########################"
+	print("\n########################\n## Circularity report ##\n########################")
 	nothing = True
 	if len(clips) >=  1:
-		print "\nFound %i candidate(s) for circularity supported by duplicated %i-mers:" %(len(clips), k)
+		print("\nFound %i candidate(s) for circularity supported by duplicated %i-mers:" %(len(clips), k))
 		for l in sorted(clips):
-			print "\t- suggested clip points %i - %i (length %s; supported by %i duplicted %i-mers); extract by adding '-l %i' or '-c %s,%s' to your command" %(int(clips[l][0][0]), int(clips[l][0][1]), l, len(clips[l])/2, k, l, clips[l][0][0], clips[l][0][1])
+			print("\t- suggested clip points %i - %i (length %s; supported by %i duplicted %i-mers); extract by adding '-l %i' or '-c %s,%s' to your command" %(int(clips[l][0][0]), int(clips[l][0][1]), l, len(clips[l])/2, k, l, clips[l][0][0], clips[l][0][1]))
 		nothing = False
 
 
@@ -326,24 +326,24 @@ for k in range(kmers[0],kmers[1],kmers[2]):
 				if motifs_by_regions[m][i][1] == len(seqs[s]):
 					primes.append(i)
 			if len(primes) == 2:
-				print "\nFound motif '%s' at terminal positions (see 'Repeat report' above), which could indicate circularity." %m
+				print("\nFound motif '%s' at terminal positions (see 'Repeat report' above), which could indicate circularity." %m)
 				start_clip = motifs_by_regions[m][primes[0]][1]
 				end_clip = motifs_by_regions[m][primes[1]][1]
-				print "\t- suggested clip points: %s - %s (length %s); extract the clipped sequence by adding '-c %s,%s' to your command" %(start_clip, end_clip, end_clip-start_clip, start_clip, end_clip)
-				print "\n\tThis will remove the repeated motif from the 5' end of the sequence.\n\tThe correct length can currently not be determined unambiguously because of the repeat. Longer reads could resolve this.\n"
+				print("\t- suggested clip points: %s - %s (length %s); extract the clipped sequence by adding '-c %s,%s' to your command" %(start_clip, end_clip, end_clip-start_clip, start_clip, end_clip))
+				print("\n\tThis will remove the repeated motif from the 5' end of the sequence.\n\tThe correct length can currently not be determined unambiguously because of the repeat. Longer reads could resolve this.\n")
 				sys.exit()
 
 	if nothing:
-		print "\nDid not find any candidates for circularity using k = %s\n" %k
+		print("\nDid not find any candidates for circularity using k = %s\n" %k)
 		sys.exit()
 	
-	print ""
+	print("")
 
 
 
 if args.extract_by_length:
-	print "\n####################\n## Result output ##\n####################\n"
-	print "Extracting by expected length .."
+	print("\n####################\n## Result output ##\n####################\n")
+	print("Extracting by expected length ..")
 	
 	if args.length_tolerance_absolute:
 		minlength = args.extract_by_length - args.length_tolerance_absolute
@@ -355,7 +355,7 @@ if args.extract_by_length:
 		minlength = args.extract_by_length
 		maxlength = minlength
 	
-	print "specified length: %s (tolerance: %s - %s) - Evaluating candidate lengths" %(args.extract_by_length, minlength, maxlength)
+	print("specified length: %s (tolerance: %s - %s) - Evaluating candidate lengths" %(args.extract_by_length, minlength, maxlength))
 	for l in sorted(clips):
 		if l <= maxlength and l >= minlength:
 			pass
@@ -363,7 +363,7 @@ if args.extract_by_length:
 			del(clips[l])
 
 	if clips:
-		print "\nFound candidates in the expected length range"
+		print("\nFound candidates in the expected length range")
 		for s in seqs:
 			for l in sorted(clips):
 				write_clipped(s, seqs[s], clips[l][0][0], clips[l][0][1], args.prefix)
@@ -383,4 +383,4 @@ if args.extract_by_length:
 #				out.write(">test_%s\n%s\n" %(str(l),sequence))
 #				out.close()
 	else:
-		print "\nDid not find any candidates in the specified length range\n"
+		print("\nDid not find any candidates in the specified length range\n")
